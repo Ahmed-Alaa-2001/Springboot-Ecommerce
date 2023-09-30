@@ -1,9 +1,8 @@
 package com.example.SpringbootEcommerce.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
-public class RegisterDTO {
+public class UserDTO {
     @NotBlank
     @NotNull
     @Size(min=3, max=255)

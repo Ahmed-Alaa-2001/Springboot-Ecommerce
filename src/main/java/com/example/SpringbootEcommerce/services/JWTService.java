@@ -1,4 +1,4 @@
-package com.example.SpringbootEcommerce.security;
+package com.example.SpringbootEcommerce.services;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -29,5 +29,8 @@ public class JWTService {
                 .withExpiresAt(new Date(System.currentTimeMillis()+(expiryTime*1000)))
                 .withIssuer(issuer)
                 .sign(algorithm);
+    }
+    public String getUsername(String token){
+        return JWT.decode(token).getClaim("USERNAME").asString();
     }
 }
