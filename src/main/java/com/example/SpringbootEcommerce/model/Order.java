@@ -1,5 +1,6 @@
 package com.example.SpringbootEcommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,14 +16,29 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id",nullable = false)
     private Long id;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
-    @ManyToOne(optional = false)
+    @JsonIgnore
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+    @ManyToOne
     @JoinColumn(name="address_id")
     private Address address;
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderQuantities> quantities = new ArrayList<>();
+    @Column(name="card_number")
+    private String cardNumber;
+//    @OneToMany
+//    private List<CartItem> cartItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "order", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private User user;
+
+    private Double total;
+//    @OneToMany(mappedBy = "order")
+//    private List<CartItem> cartItems = new ArrayList<>();
+
 //    public List<OrderQuantities> getQuantities() {
 //        return quantities;
 //    }

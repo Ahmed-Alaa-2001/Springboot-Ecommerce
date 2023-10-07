@@ -19,7 +19,7 @@ public class SecurityConfig {
         http.addFilterBefore(jwtFilter, AuthorizationFilter.class);
 
         //http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/product/getproducts","/auth/login","/auth/register").permitAll().anyRequest().authenticated());
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/product/getproducts","/auth/**").permitAll().anyRequest().authenticated());
         return http.build();
     }
 }

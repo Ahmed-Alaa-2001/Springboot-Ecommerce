@@ -29,11 +29,20 @@ public class User {
     private String firstName;
     @Column(name="last_name",nullable = false)
     private String lastName;
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Address> addressList=new ArrayList<>();
+    @Pattern(regexp = "[0-9]{16,18}", message = "Invalid card number")
+    private String creditCard;
+//    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Address address;
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private Cart cart;
+
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "order_id", unique = true)
+    private Order order;
+
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<Order> orders = new ArrayList<>();
 
 //    public Cart getCart() {
 //        return cart;

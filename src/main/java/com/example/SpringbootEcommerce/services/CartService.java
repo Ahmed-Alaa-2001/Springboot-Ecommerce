@@ -12,6 +12,7 @@ import com.example.SpringbootEcommerce.repository.CartRepository;
 import com.example.SpringbootEcommerce.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,21 +32,17 @@ public class CartService {
     private CartItemRepository cartItemRepository;
 
     public Cart addItemsToCart(String productName, User currentUser) throws UserNotFound, ProductNotFound {
-//        Optional<CartItem>opCartItem = cartItemRepository.find(productName);
         System.out.println(currentUser.getUserName());
         Optional<User>opUser = userRepository.findByUserNameIgnoreCase(currentUser.getUserName());
         if(!opUser.isPresent()){
             throw new UserNotFound("User doesn't exist");
         }
-        System.out.println("000000000000");
-        CartItem item = cartItemService.addProductToCartItem(productName);
+        CartItem item = cartItemService.addProductToCartItem(productName,currentUser);
 //        System.out.println(item.getProduct().getName());
         User user = opUser.get();
         Cart userCart = user.getCart();
-        //item.setProduct(productRepository.findByNameIgnoreCase(productName).orElseThrow(() -> new ProductNotFound("Product not found")));
-        System.out.println("111111111111111111");
         item.setCart(userCart);
-        System.out.println("222222222222222");
+        //item.setProduct(productRepository.findByNameIgnoreCase(productName).orElseThrow(() -> new ProductNotFound("Product not found")));
 //        if (userCart == null) {
 //            userCart = new Cart();
 //            System.out.println(userCart);
@@ -56,7 +53,7 @@ public class CartService {
         List<CartItem> cartItems = userCart.getCartItems();
         if(cartItems.isEmpty()){
             cartItems.add(item);
-            System.out.println(cartItems.get(0).getProduct().getName()+"hh");
+            System.out.println(cartItems.get(0).getId());
             userCart.setTotalPrice(item.getProduct().getPrice());
             System.out.println(userCart.getTotalPrice());
         }
@@ -75,11 +72,50 @@ public class CartService {
                 userCart.setTotalPrice(userCart.getTotalPrice()+item.getProduct().getPrice());
             }
         }
-        System.out.println("3333333333333");
-        System.out.println(user.getCart());
-        System.out.println(userCart);
         return cartRepository.save(user.getCart());
     }
+    public Cart getUserCart(User user) throws CartNotFound {
+        Cart cart=user.getCart();
+        Optional<Cart>opCart = cartRepository.findById(cart.getId());
+        if(!opCart.isPresent()){
+            throw new CartNotFound("User's cart is empty");
+        }
+        System.out.println(opCart.get());
+        return opCart.get();
+    }
+    public CartItem deleteItemUserCart(User user,String ProductName) throws ProductNotFound {
+        Cart cart=user.getCart();
+        Optional<CartItem>opCartItem = cartItemRepository.findCartItemsByProductNameAndUsername(ProductName,user.getUserName());
+//        System.out.println(ProductName+" "+user.getUserName());
+        if(!opCartItem.isPresent()){
+            throw new ProductNotFound("Product isn't exist in this user cart");
+        }
+        CartItem cartItem= opCartItem.get();
+        cartItem.getCart().setTotalPrice(cartItem.getCart().getTotalPrice()-cartItem.getProduct().getPrice()*cartItem.getQuantity());
+        cartItemRepository.deleteById(opCartItem.get().getId());
+//        System.out.println(user.getCart());
+        return opCartItem.get();
+    }
+
+
+
+
+
+
+//    @Transactional
+//    public CartItem deleteItemUserCart(User user,String ProductName) throws ProductNotFound {
+//        Cart cart=user.getCart();
+//        Optional<CartItem>opCartItem = cartItemRepository.findCartItemsByProductNameAndUsername(ProductName,user.getUserName());
+//        System.out.println(ProductName+" "+user.getUserName());
+//        System.out.println(opCartItem.get());
+//        if(!opCartItem.isPresent()){
+//            throw new ProductNotFound("Product isn't exist in this user cart");
+//        }
+//        cartItemRepository.deleteById(opCartItem.get().getId());
+////        System.out.println(user.getCart());
+//        return opCartItem.get();
+//    }
+
 //public Cart addItemsToCart(String productName, User currentUser) throws UserNotFound, ProductNotFound {
 //    Optional<User>opUser = userRepository.findByUserNameIgnoreCase(currentUser.getUserName());
 //    if(!opUser.isPresent()){
@@ -122,12 +158,4 @@ public class CartService {
 ////    System.out.println(opcar.get().getCartItems().get(0).getProduct().getName());
 ////    return car;
 //}
-    public Cart getUserCart(User user) throws CartNotFound {
-        Cart cart=user.getCart();
-        Optional<Cart>opCart = cartRepository.findById(cart.getId());
-        if(!opCart.isPresent()){
-            throw new CartNotFound("User's cart is empty");
-        }
-        return cart;
-    }
 }

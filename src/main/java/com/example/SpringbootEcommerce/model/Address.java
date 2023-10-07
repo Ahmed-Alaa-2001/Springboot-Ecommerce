@@ -2,7 +2,11 @@ package com.example.SpringbootEcommerce.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name="address")
 public class Address {
@@ -17,7 +21,7 @@ public class Address {
     @Column(name="country",nullable = false)
     private String country;
     @JsonIgnore
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(name="user_id",nullable = false)
     private User user;
 //    public Long getId(){return id;}

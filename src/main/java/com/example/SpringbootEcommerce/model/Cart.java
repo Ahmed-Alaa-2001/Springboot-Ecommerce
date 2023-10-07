@@ -17,7 +17,7 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,mappedBy = "cart")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "cart", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<CartItem>cartItems=new ArrayList<>();
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

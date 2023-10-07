@@ -1,9 +1,12 @@
 package com.example.SpringbootEcommerce.controller;
 
+import com.example.SpringbootEcommerce.dto.AddressDTO;
 import com.example.SpringbootEcommerce.dto.LoginDTO;
 import com.example.SpringbootEcommerce.dto.UserDTO;
+import com.example.SpringbootEcommerce.exceptions.AddressNotFound;
 import com.example.SpringbootEcommerce.exceptions.UserExists;
 import com.example.SpringbootEcommerce.exceptions.UserNotFound;
+import com.example.SpringbootEcommerce.model.Address;
 import com.example.SpringbootEcommerce.model.User;
 import com.example.SpringbootEcommerce.services.UserService;
 import jakarta.validation.Valid;
@@ -85,4 +88,22 @@ public class AuthenticationController {
             return new ResponseEntity<String>(err.getMessage(),HttpStatus.CONFLICT);
         }
     }
+    @PostMapping("/creditcart/add")
+    public ResponseEntity addAndUpdateAddress(@RequestBody String creditCart,@AuthenticationPrincipal User user){
+        return new ResponseEntity<User>(userService.addAndUpdateAddress(creditCart,user),HttpStatus.OK);
+    }
+    @PostMapping("/address/add")
+    public ResponseEntity addAndUpdateAddress(@RequestBody AddressDTO addressDTO,@AuthenticationPrincipal User user){
+        return new ResponseEntity<Address>(userService.addAndUpdateAddress(addressDTO,user),HttpStatus.CREATED);
+    }
+    @DeleteMapping("/address/delete")
+    public ResponseEntity deleteAddress(@AuthenticationPrincipal User user) throws AddressNotFound {
+        try {
+            return new ResponseEntity<Address>(userService.deleteAddress(user), HttpStatus.OK);
+        }
+        catch (AddressNotFound err){
+            return new ResponseEntity<String>(err.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

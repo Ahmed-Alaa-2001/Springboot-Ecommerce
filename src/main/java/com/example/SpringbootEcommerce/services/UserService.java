@@ -1,13 +1,21 @@
 package com.example.SpringbootEcommerce.services;
 
+import com.example.SpringbootEcommerce.dto.AddressDTO;
 import com.example.SpringbootEcommerce.dto.UserDTO;
+import com.example.SpringbootEcommerce.exceptions.AddressNotFound;
 import com.example.SpringbootEcommerce.exceptions.UserExists;
 import com.example.SpringbootEcommerce.exceptions.UserNotFound;
+import com.example.SpringbootEcommerce.model.Address;
 import com.example.SpringbootEcommerce.model.Cart;
+import com.example.SpringbootEcommerce.model.Order;
 import com.example.SpringbootEcommerce.model.User;
+import com.example.SpringbootEcommerce.repository.AddressRepository;
 import com.example.SpringbootEcommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +24,8 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AddressRepository addressRepository;
     @Autowired
     private  EncryptionService encryptionService;
     @Autowired
@@ -32,6 +42,8 @@ public class UserService {
            password.length()<3 || password.length()>255){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid password format or length");
         }*/
+        Order order = new Order();
+//        List<Order> orders = new ArrayList<>();
         Cart cart = new Cart();
         User userEntity=new User();
         userEntity.setUserName(user.getUserName());
@@ -40,8 +52,11 @@ public class UserService {
         userEntity.setLastName(user.getLastName());
         userEntity.setCart(cart);
         cart.setUser(userEntity);
+        userEntity.setOrder(order);
+        order.setUser(userEntity);
+//        userEntity.setCart(cart);
         userEntity.setPassword(encryptionService.encryptPassword(user.getPassword()));
-        System.out.println(userEntity);
+//        System.out.println(userEntity.getCart());
         return userRepository.save(userEntity);
     }
     public String login(String username,String password){
@@ -99,4 +114,59 @@ public class UserService {
         existUser.setPassword(encryptionService.encryptPassword(userDTO.getPassword()));
         return userRepository.save(existUser);
     }
+    public User addAndUpdateAddress(String creditCart, User user){
+        user.setCreditCard(creditCart);
+        return userRepository.save(user);
+    }
+    public Address addAndUpdateAddress(AddressDTO addressDTO,User user){
+//        Optional<Address>opAddress=addressRepository.findByAddressAndUserName(addressDTO.getAddress(),user.getUserName());
+//        Optional<Address>opAddress=addressRepository.findById(id);
+        Address address;
+        if(user.getAddress()== null){
+            address = new Address();
+            address.setUser(user);
+        }
+        else address = user.getAddress();
+        address.setAddress(addressDTO.getAddress());
+        address.setCity(addressDTO.getCity());
+        address.setCountry(addressDTO.getCountry());
+        addressRepository.save(address);
+        return address;
+    }
+    public Address deleteAddress(User user)throws AddressNotFound{
+//        Optional<Address>opAddress = addressRepository.findByAddressAndUserName(id,user.getUserName());
+        if(user.getAddress()==null) {
+            throw new AddressNotFound("Address isn't exist with given id");
+        }
+        addressRepository.deleteById(user.getAddress().getId());
+        return user.getAddress();
+    }
 }
+
+
+
+
+
+
+
+
+
+//    public Address addAndUpdateAddress(AddressDTO addressDTO,User user,Long id){
+////        Optional<Address>opAddress=addressRepository.findByAddressAndUserName(addressDTO.getAddress(),user.getUserName());
+//        Optional<Address>opAddress=addressRepository.findById(id);
+//        if(opAddress.isPresent()){
+//            Address address = opAddress.get();
+//            address.setAddress(addressDTO.getAddress());
+//            address.setCity(addressDTO.getCity());
+//            address.setCountry(addressDTO.getCountry());
+//            addressRepository.save(address);
+//            return address;
+//        }
+//        Address address = new Address();
+//        address.setAddress(addressDTO.getAddress());
+//        address.setCity(addressDTO.getCity());
+//        address.setCountry(addressDTO.getCountry());
+//        address.setUser(user);
+//        addressRepository.save(address);
+//        return address;
+//    }

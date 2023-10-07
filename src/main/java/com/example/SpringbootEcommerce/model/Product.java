@@ -27,15 +27,18 @@ public class Product {
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<CartItem> cartItems = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private List<OrderItem> orderItems = new ArrayList<>();
 //    @OneToOne(mappedBy = "product",optional = false,cascade = CascadeType.ALL,orphanRemoval = true)
 //    @JsonIgnore
 //    private CartItem cartItem;
 //    @ManyToOne(optional = false,cascade = CascadeType.ALL)
 //    @JsonIgnore
 //    private CartItem cartItem;
-    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    List<OrderQuantities> orderQuantities=new ArrayList<>();
+//    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonIgnore
+//    List<OrderQuantities> orderQuantities=new ArrayList<>();
 
 
 //    public List<OrderQuantities> getOrderQuantities() {
